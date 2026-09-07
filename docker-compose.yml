@@ -1,0 +1,72 @@
+services:
+  db:
+    build:
+      context: ./database
+    container_name: solapur_db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-solapur_rural_db}
+      POSTGRES_USER: ${POSTGRES_USER:-solapur_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-solapur_pass}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-solapur_user} -d ${POSTGRES_DB:-solapur_rural_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: solapur_backend
+    environment:
+      ENVIRONMENT: development
+      DEMO_MODE: "true"
+      DATABASE_URL: postgresql+psycopg2://${POSTGRES_USER:-solapur_user}:${POSTGRES_PASSWORD:-solapur_pass}@db:5432/${POSTGRES_DB:-solapur_rural_db}
+      JWT_SECRET: ${JWT_SECRET:-change_me_to_a_long_random_string}
+      CORS_ORIGINS: http://localhost:${FRONTEND_PORT:-5173},http://127.0.0.1:${FRONTEND_PORT:-5173}
+      SEED_DEMO_DATA: ${SEED_DEMO_DATA:-true}
+      GOOGLE_MAPS_API_KEY: ${GOOGLE_MAPS_API_KEY:-}
+      LLM_API_KEY: ${LLM_API_KEY:-}
+      LLM_MODEL: ${LLM_MODEL:-}
+      EMBEDDING_MODEL: ${EMBEDDING_MODEL:-}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.5-flash}
+      ELEVENLABS_API_KEY: ${ELEVENLABS_API_KEY:-}
+      ELEVENLABS_VOICE_ID: ${ELEVENLABS_VOICE_ID:-21m00Tcm4TlvDq8ikWAM}
+      ELEVENLABS_MODEL: ${ELEVENLABS_MODEL:-eleven_multilingual_v2}
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "${BACKEND_PORT:-8000}:8000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:8000}
+    container_name: solapur_frontend
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "${FRONTEND_PORT:-5173}:80"
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    name: solapur_postgres_data

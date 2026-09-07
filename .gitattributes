@@ -1,0 +1,8 @@
+# Shell scripts must keep LF line endings even when checked out on Windows,
+# or the Docker container will fail with "exec format error" / "$'\r':
+# command not found" when running docker-entrypoint.sh.
+*.sh text eol=lf
+Dockerfile text eol=lf
+docker-compose.yml text eol=lf
+*.sql text eol=lf
+*.bat text eol=crlf

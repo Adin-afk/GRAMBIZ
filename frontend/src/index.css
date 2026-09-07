@@ -1,0 +1,70 @@
+@import "tailwindcss";
+
+@theme {
+  /* Paper/document palette - deliberately not the cream-#F4F1EA AI default */
+  --color-bg: #f5f4f0;
+  --color-surface: #ffffff;
+  --color-surface-raised: #fbfaf8;
+
+  --color-ink: #1c1e22;
+  --color-ink-muted: #565b62;
+  --color-ink-faint: #8a8f96;
+
+  --color-border: #dcdbd5;
+  --color-border-strong: #b9b8b1;
+
+  /* Deep navy - the trust/banking/government register */
+  --color-primary: #1b3a5c;
+  --color-primary-dark: #10283f;
+  --color-primary-light: #2d5680;
+
+  /* Restrained ochre accent - used sparingly for primary actions only */
+  --color-accent: #a8641a;
+  --color-accent-dark: #874f14;
+
+  /* Semantic status colors */
+  --color-verified: #2e7d46;
+  --color-demo: #a66a00;
+  --color-risk-low: #2e7d46;
+  --color-risk-medium: #a8641a;
+  --color-risk-high: #b23a3a;
+
+  --font-display: "Source Serif 4", Georgia, serif;
+  --font-body: "IBM Plex Sans", "Noto Sans", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", "Courier New", monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  margin: 0;
+}
+
+/* Tabular figures for all monetary/score data */
+.figures {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
